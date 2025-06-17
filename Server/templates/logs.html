@@ -1,0 +1,89 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="SGCC" content="width=device-weidth, initial-scale=1.0">
+        <title>SGCC</title>
+        <link href = "{{ url_for('static', filename='css/main.css')}}" rel="stylesheet" />
+        <link href = "{{ url_for('static', filename='images/designer.png')}}", rel="icon"/>
+    </head>
+    <body class="darkmode">
+
+        <!-- We want to put some spaces before the darkmode/lightmode toggle so it doesn't feel cramped -->
+        <br>&nbsp;&nbsp;&nbsp;
+        <button class="darkmode" id="theme-toggle"><img style="width:64px;height:64px;float: right;" src="{{ url_for('static', filename='images/toggle.png')}}" alt="Toggle Theme"></button>
+
+        <!-- headers for the logs table -->
+        <div style="margin-top: 50px; border:1px solid #ccc; overflow:auto;">
+            <table class="darkmode">
+                <tr><th class="darkmode">TASK ID</th><th class="darkmode">IMPLANT ID</th><th class="darkmode">Operator</th>
+                    <th class="darkmode">IP Address</th>
+                    <th class="darkmode">MAC Address</th><th class="darkmode">DHCP Status</th><th class="darkmode">Hostname</th>
+                    <th class="darkmode">Username</th><th class="darkmode">Domain</th>
+                    <th class="darkmode">FQDN</th><th class="darkmode">PID</th><th class="darkmode">PPID</th><th class="darkmode">Task Type</th>
+                    <th class="darkmode">Task Options</th><th class="darkmode">Task Time</th><th class="darkmode">Results Time</th>
+                    <th class="darkmode">Results</th> 
+    
+                <!-- Loops through each log entry, and shows us the logs -->
+                {% for log in logs %}
+                <tr>
+                    <td class="darkmode" style=white-space:pre;>{{ log[9] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[10] }}></td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[15] }}></td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[0] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[1] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[2] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[3] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[4] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[5] }}></td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[6] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[7] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[8] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[11] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[12] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[13] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[14] }}</td>
+                    <td class="darkmode" style=white-space:pre;>{{ log[16] }}</td>
+                </tr>
+            
+                {% endfor %}
+            </table>
+            </div>
+
+
+    </body>
+    <script>
+        // gets the desired theme, darkmode vs lightmode
+        var savedTheme = localStorage.getItem('theme');
+
+        // gets the list of each item that needs to be toggled (since this is calculated dynamically b/c of the log loop)
+        var button = document.getElementById('theme-toggle');
+        var boxes = document.querySelectorAll('.darkmode');
+
+        // if we are in lightmode, change to darkmode
+        if (savedTheme === 'lightmode') 
+        {    
+            boxes.forEach(box => {
+                box.classList.toggle('darkmode');
+            });
+        }
+
+        // if we click the darkmode/lightmode toggle, changes the saved theme, and toggles
+        button.addEventListener('click', () => {
+
+            if(savedTheme === "darkmode")
+            {
+                savedTheme = "lightmode";
+            }
+            else
+            {
+                savedTheme = "darkmode";
+            }
+            
+            boxes.forEach(box => {
+
+                box.classList.toggle('darkmode');
+                localStorage.setItem('theme', savedTheme);
+            });
+        });
+    </script>
+</html>

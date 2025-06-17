@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<!--
+    TODO
+        1. implement functionality
+        2. make css pretty and external
+        3. externalize javascript
+
+-->
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="SGCC" content="width=device-weidth, initial-scale=1.0">
+        <title>SGCC Login</title>
+        <link href = "{{ url_for('static', filename='css/main.css')}}" rel="stylesheet" />
+        <link href = "{{ url_for('static', filename='images/designer.png')}}", rel="icon"/>
+    </head>
+    <body class="darkmode">
+
+        <div class="container">  <!-- Wrapper for form -->
+            <h2 class="word">Login</h2>
+            
+            <form action="{{ url_for('login') }}" method="post">
+                <div>{{ msg }}</div>
+    
+                <input class="textbox" type="text" name="username" placeholder="Enter Username" required>
+                <input class="textbox" type="password" name="password" placeholder="Enter Password" required>
+                
+                <button class="btn" type="submit">Login</button>
+            </form>
+    
+            <p class="bottom">Don't have an account? <a href="{{ url_for('register') }}">Register here</a></p>
+        </div>
+    </body>
+</html>

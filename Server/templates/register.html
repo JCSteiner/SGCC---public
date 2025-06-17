@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href = "{{ url_for('static', filename='css/main.css')}}" rel="stylesheet" />
+    <link href = "{{ url_for('static', filename='images/designer.png')}}", rel="icon"/>
+    <title>SGCC Register</title>
+</head>
+<body class="darkmode">
+
+    <div class="container">  <!-- Wrapper for form -->
+        <h2 class="word">Register</h2>
+
+        <form action="{{ url_for('register') }}" method="post">
+            <div>{{ msg }}</div>
+
+            <input class="textbox" type="text" name="username" placeholder="Enter Username" required>
+            <input class="textbox" type="password" name="password" placeholder="Enter Password" required>
+
+            <button class="btn" type="submit">Register</button>
+        </form>
+
+        <p class="bottom">Already have an account? <a href="{{ url_for('login') }}">Login here</a></p>
+    </div>
+
+</body>
+</html>

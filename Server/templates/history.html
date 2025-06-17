@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <!-- turbo needed for web sockets -->
+        {{ turbo() }}
+    </head>
+        <div class = "darkmode" id="history" style="margin-top: 20px; height: 600px; width:100%; overflow:auto;display: flex;flex-direction: column-reverse;">
+         
+            {% for n in range(num_implants) %}
+
+            <table id = "history{{ implants[n][0] }}" class="darkmode">
+            <tr id = "history{{ implants[n][0] }}">
+                <th id = "history{{ implants[n][0] }}" class="darkmode" >Task Time</th>
+                <th id = "history{{ implants[n][0] }}" class="darkmode" >Operator</th>
+                <th id = "history{{ implants[n][0] }}" class="darkmode" >Task Type</th>
+                <th id = "history{{ implants[n][0] }}" class="darkmode" >Task Options</th>
+                <th id = "history{{ implants[n][0] }}" class="darkmode" >Result Time</th>
+                <th id = "history{{ implants[n][0] }}" class="darkmode" >Results</th>
+            </tr>
+
+            {% for h in history[n] %}
+            <tr id = "history{{ implants[n][0] }}">
+                
+                <td id = "history{{ implants[n][0] }}" class="darkmode" style="width:10%;white-space: pre-wrap;">{{ h[0] }}</td>
+                <td id = "history{{ implants[n][0] }}" class="darkmode" style="width:10%;white-space: pre-wrap;">{{ h[1] }}</td>
+                <td id = "history{{ implants[n][0] }}" class="darkmode" style="width:10%;white-space: pre-wrap;">{{ h[2] }}</td>
+                <td id = "history{{ implants[n][0] }}" class="darkmode" style="width:10%;white-space: pre-wrap;">{{ h[3] }}</td>
+                <td id = "history{{ implants[n][0] }}" class="darkmode" style="width:10%;white-space: pre-wrap;">{{ h[4] }}</td>
+                <td id = "history{{ implants[n][0] }}" class="darkmode" style="white-space: pre-wrap;">{{ h[5] }}</td>
+                
+            </tr>
+            {% endfor %}
+            
+            </table>
+
+            {% endfor %}
+
+        </div>
+    <script>
+
+        // loops through each implant
+        {% for n in range(num_implants) %}
+
+        // if we click their interact button
+        document.getElementById("{{ implants[n][0] }}").addEventListener("click", function () {
+
+            var elements = document.querySelectorAll('[id^="history"]');
+            var savedTheme = localStorage.getItem('theme');
+            
+            for(let i = 0; i < elements.length; i++)
+            {
+                if(elements[i].id === "history{{ implants[n][0]}}")
+                {
+                    document.getElementById(elements[i].id).style.display = "table";
+                }
+                else if(elements[i].id != "history")
+                {
+                    document.getElementById(elements[i].id).style.display = "none";
+                }
+            }
+
+            // stores which implant we were last targeting so it doesn't feel weird on refresh
+            focused_implant = "{{ implants[n][0] }}";
+            localStorage.setItem('focused_implant', focused_implant);
+        });
+
+        {% endfor %}
+
+        focused_implant = localStorage.getItem('focused_implant');
+        
+        document.getElementById(focused_implant).click();
+    </script>
+</html>

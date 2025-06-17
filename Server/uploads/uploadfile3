@@ -1,0 +1,22 @@
+HTTP/1.1 400 Bad Request
+Date: Mon, 15 Aug 2022 10:38:13 GMT
+Content-Type: application/json
+Content-Length: 127
+Connection: close
+access-control-allow-origin: https://discord.com
+access-control-allow-credentials: true
+access-control-allow-methods: POST, GET, PUT, PATCH, DELETE
+access-control-allow-headers: Content-Type, Authorization, X-Audit-Log-Reason, X-Track, X-Super-Properties, X-Context-Properties, X-Failed-Requests, X-Fingerprint, X-RPC-Proxy, X-Discord-Locale, X-Debug-Options, x-client-trace-id, If-None-Match, Range, X-RateLimit-Precision
+strict-transport-security: max-age=31536000; includeSubDomains; preload
+x-envoy-upstream-service-time: 40
+Via: 1.1 google
+Alt-Svc: h3=":443"; ma=86400, h3-29=":443"; ma=86400
+CF-Cache-Status: DYNAMIC
+Expect-CT: max-age=604800, report-uri="https://report-uri.cloudflare.com/cdn-cgi/beacon/expect-ct"
+Report-To: {"endpoints":[{"url":"https:\/\/a.nel.cloudflare.com\/report\/v3?s=NVkTuc0Tiecsv86A00v9WwDmAGBhWkOIUSbzNAmn7bbAEuwnrV8j1%2BNMu8qkv6yLwwy6izaKGbhzvNCLUrKlKUm1mjN8L3e2qu4mjYSmMI%2Bj5mLbso23JbU1P2Ah"}],"group":"cf-nel","max_age":604800}
+NEL: {"success_fraction":0,"report_to":"cf-nel","max_age":604800}
+X-Content-Type-Options: nosniff
+Server: cloudflare
+CF-RAY: 73b14ca4bbd187d8-SIN
+
+{"captcha_key": ["captcha-required"], "captcha_sitekey": "f5561ba9-8f1e-40ca-9b5b-a0b3f719ef34", "captcha_service": "hcaptcha"}
